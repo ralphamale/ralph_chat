@@ -1,76 +1,81 @@
-* Switch to postgres
-* Make sure all indices are there
-* Make sure everything is tested
-* Documentation
+## Ralph Chat ##
+Simple RESTful Chat API that allows users to have send messages to one another and outputs a log of their message. 
+
+Every route besides UsersController#create, SessionsController#create, and SessionsController#destroy require you to have a request header with an 'Authorization' key.
+
+I'll go over the implementation in interviews, but here is a high level of the routes:
 
 
-Users
+    POST   /api/v1/sessions
+Request body:
 
-Users can participate in chats by creating Conversations with other users. They are identified by a unique ID and email. Using the API, you may change the email and password of each user.
+    { 'session': { 'email': {user email}, 'password': {password} } }
 
-Resource representations
-
-Name	Type	Description
-`id`	integer	User's unique ID
-`email`	string	User's unique Email
-`password`	string	User's password. Must match password_confirmation
-`password_confirmation`	string
-
-Actions
-
--All requests must be urlencoded
-
-Action 				HTTP request 			Description
-Create a User 		`POST` /users 			Creates a new user
-List users 			`GET` /users 			Returns a list of users in application
-Update a user 		`PUT` /users/{user_id} 	Updates the user's information
-View a user 		`GET` /users/{user_id} 	Returns user's information
-Delete a user 		`DELETE` /users/{user_id} 	Deletes the user
+Returns `user` object which has an `auth_token` to be used for the request header `Authorization` key.
 
 
-Create a user
-
-Creates a new user in the application.
-
-Users are identified by a unique ID and email address. 
-
-`POST /api/v1/users`
+----------
 
 
-Request body
-
-Name, type, description
-
-`email` 		string		User's email. Must be unique.
-`password`		string
+    DELETE /api/v1/sessions/:id
+`:id` is auth_token. Destroys `auth_token` and generates new one for next time.
 
 
-
-== README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+----------
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+    GET    /api/v1/users
+
+Gets list of users
+
+
+----------
+
+
+    POST   /api/v1/users
+
+Create a new user. Email must be unique.
+
+Request body:
+
+    { 'user': { 'email': {unique_email}, 'password': {password}, 'password_confirmation': {password} } }
+
+
+----------
+
+
+    GET    /api/v1/conversations
+
+Get current user's conversations
+
+
+----------
+
+
+    POST   /api/v1/conversations
+
+
+Create a conversation with another user. If conversation exists, it returns the existing one.
+
+Request body:
+
+    { 'conversation': { 'user2_id': {recipient_user_id} } }
+
+----------
+
+    GET    /api/v1/conversations/:conversation_id/messages
+
+Get list of messages from conversation
+
+
+----------
+
+
+    POST   /api/v1/conversations/:conversation_id/messages
+
+Create new message in conversation 
+
+Request body:
+
+    { 'message': { 'content': {message_content} } }
+
